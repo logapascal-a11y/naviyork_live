@@ -1,0 +1,278 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'SmartPass NYC',
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: const MapScreen(),
+    );
+  }
+}
+
+class MapScreen extends StatefulWidget {
+  const MapScreen({super.key});
+
+  @override
+  State<MapScreen> createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+  final MapController _mapController = MapController();
+  final LatLng _nycCenter = const LatLng(40.7484, -73.9857);
+  final LatLngBounds _nycBounds = LatLngBounds(
+    const LatLng(40.4774, -74.2589),
+    const LatLng(40.9176, -73.7004),
+  );
+
+  bool _showSubwayLines = false;
+  
+  List<Polyline> _subwayPolylines = [];
+  List<Marker> _stationMarkers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSubwayData();
+  }
+
+  Color _getSubwayColor(String name) {
+    if (name.isEmpty) return Colors.indigo; // Standardfarbe für Reste
+    name = name.toUpperCase();
+    if (name.contains('1') || name.contains('2') || name.contains('3')) return Colors.red;
+    if (name.contains('4') || name.contains('5') || name.contains('6')) return Colors.green;
+    if (name.contains('7')) return Colors.purple;
+    if (name.contains('A') || name.contains('C') || name.contains('E')) return Colors.blue;
+    if (name.contains('B') || name.contains('D') || name.contains('F') || name.contains('M')) return Colors.orange;
+    if (name.contains('N') || name.contains('Q') || name.contains('R') || name.contains('W')) return const Color(0xFFFFD700);
+    if (name.contains('G')) return Colors.lightGreen;
+    if (name.contains('J') || name.contains('Z')) return Colors.brown;
+    if (name.contains('L')) return Colors.grey;
+    return Colors.indigo; 
+  }
+
+  Future<void> _loadSubwayData() async {
+    try {
+      // 1. LINIEN LADEN
+      final String linesRes = await rootBundle.loadString('assets/subway.json');
+      final linesData = await json.decode(linesRes);
+      List<Polyline> loadedLines = [];
+
+      if (linesData['features'] != null) {
+        for (var feature in linesData['features']) {
+          var geometry = feature['geometry'];
+          var properties = feature['properties'] ?? {};
+          
+          if (geometry == null || geometry['coordinates'] == null) continue;
+
+          // PERFEKTE LINIEN-ERKENNUNG (Fehler entfernt, der alles rot gemacht hat)
+          String lineName = properties['service_name'] ?? properties['route_id'] ?? properties['name'] ?? properties['rt_symbol'] ?? '';
+          Color lineColor = _getSubwayColor(lineName);
+
+          if (geometry['type'] == 'LineString') {
+            List<LatLng> points = [];
+            for (var coords in geometry['coordinates']) {
+              if (coords != null && coords.length >= 2) points.add(LatLng(coords[1], coords[0]));
+            }
+            loadedLines.add(Polyline(points: points, color: lineColor.withOpacity(0.8), strokeWidth: 4.0));
+          } else if (geometry['type'] == 'MultiLineString') {
+            for (var line in geometry['coordinates']) {
+              if (line == null) continue;
+              List<LatLng> points = [];
+              for (var coords in line) {
+                if (coords != null && coords.length >= 2) points.add(LatLng(coords[1], coords[0]));
+              }
+              loadedLines.add(Polyline(points: points, color: lineColor.withOpacity(0.8), strokeWidth: 4.0));
+            }
+          }
+        }
+      }
+
+      // 2. STATIONEN LADEN
+      final String stationsRes = await rootBundle.loadString('assets/stations.json');
+      
+      if (stationsRes.trim().startsWith('<') || !stationsRes.contains('FeatureCollection')) {
+        _showErrorOnScreen("Stationen-Datei kaputt oder leer. Bitte lade sie mit dem neuen Link herunter!");
+        setState(() => _subwayPolylines = loadedLines);
+        return;
+      }
+
+      final stationsData = await json.decode(stationsRes);
+      List<Marker> loadedStations = [];
+
+      if (stationsData['features'] != null) {
+        for (var feature in stationsData['features']) {
+          var geometry = feature['geometry'];
+          var properties = feature['properties'] ?? {};
+          
+          if (geometry != null && geometry['type'] == 'Point' && geometry['coordinates'] != null && geometry['coordinates'].length >= 2) {
+            // "as num).toDouble()" zwingt den Mac, GPS-Daten exakt zu lesen
+            double lng = (geometry['coordinates'][0] as num).toDouble();
+            double lat = (geometry['coordinates'][1] as num).toDouble();
+            
+            // PERFEKTE STATIONEN-ERKENNUNG (Neue Spaltennamen der Stadt New York)
+            String stationName = properties['stop_name'] ?? properties['display_name'] ?? properties['name'] ?? 'U-Bahn Station';
+            String linesAtStation = properties['daytime_routes'] ?? properties['line'] ?? properties['trains'] ?? '';
+
+            loadedStations.add(
+              Marker(
+                point: LatLng(lat, lng),
+                width: 16,
+                height: 16,
+                child: GestureDetector(
+                  onTap: () => _showStationDetails(context, stationName, linesAtStation, lat, lng),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.black, width: 2),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+        }
+      }
+      
+      setState(() {
+        _subwayPolylines = loadedLines;
+        _stationMarkers = loadedStations;
+      });
+    } catch (e) {
+      _showErrorOnScreen("Fehler beim Laden der Karte: $e");
+    }
+  }
+
+  void _showErrorOnScreen(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message, style: const TextStyle(color: Colors.white)), backgroundColor: Colors.red, duration: const Duration(seconds: 10)),
+      );
+    });
+  }
+
+  Future<void> _routeTo(double lat, double lng) async {
+    final Uri appleMapsUrl = Uri.parse('https://maps.apple.com/?daddr=$lat,$lng&dirflg=r'); 
+    if (await canLaunchUrl(appleMapsUrl)) {
+      await launchUrl(appleMapsUrl);
+    } else {
+      final Uri googleMapsUrl = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=transit');
+      await launchUrl(googleMapsUrl);
+    }
+  }
+
+  void _showStationDetails(BuildContext context, String name, String lines, double lat, double lng) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.subway, color: Colors.indigo, size: 30),
+                  const SizedBox(width: 10),
+                  Expanded(child: Text(name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold))),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text('Hier halten: $lines', style: const TextStyle(fontSize: 16, color: Colors.black54)),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  icon: const Icon(Icons.directions, color: Colors.white),
+                  label: const Text('Route hierher berechnen', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                  onPressed: () {
+                    Navigator.pop(context); // Schließt das Menü
+                    _routeTo(lat, lng); // Startet die Routenführung!
+                  },
+                ),
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return;
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) return;
+    }
+    Position position = await Geolocator.getCurrentPosition();
+    _mapController.move(LatLng(position.latitude, position.longitude), 15.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final mapStyleUrl = isDarkMode
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('SmartPass NYC'), backgroundColor: Colors.blueAccent),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(decoration: BoxDecoration(color: Colors.blueAccent), child: Text('Menü', style: TextStyle(color: Colors.white, fontSize: 24))),
+            ListTile(leading: const Icon(Icons.map), title: const Text('New York Karte'), onTap: () => Navigator.pop(context)),
+            SwitchListTile(
+              secondary: const Icon(Icons.subway, color: Colors.indigo),
+              title: const Text('U-Bahn Linien anzeigen'),
+              value: _showSubwayLines,
+              activeColor: Colors.indigo,
+              onChanged: (bool value) {
+                setState(() => _showSubwayLines = value);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.my_location, color: Colors.blueAccent),
+        onPressed: _getCurrentLocation,
+      ),
+      body: FlutterMap(
+        mapController: _mapController,
+        options: MapOptions(initialCenter: _nycCenter, initialZoom: 13.0, minZoom: 10.0, cameraConstraint: CameraConstraint.contain(bounds: _nycBounds)),
+        children: [
+          TileLayer(urlTemplate: mapStyleUrl, userAgentPackageName: 'com.pascal.smartpassnyc'),
+          if (_showSubwayLines) PolylineLayer(polylines: _subwayPolylines),
+          if (_showSubwayLines) MarkerLayer(markers: _stationMarkers),
+        ],
+      ),
+    );
+  }
+}

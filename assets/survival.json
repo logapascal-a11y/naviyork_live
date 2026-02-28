@@ -1,0 +1,220 @@
+{
+  "survival_spots": [
+    {
+      "name": "Bryant Park Restrooms",
+      "category": "Toilette",
+      "description": "Dein NaviYork Insider-Tipp: Eine der luxuriösesten öffentlichen Toiletten in ganz New York. Frische Blumen, klassische Musik und meistens sehr sauber.",
+      "lat": 40.7535,
+      "lng": -73.9833,
+      "type": "toilet"
+    },
+    {
+      "name": "Grand Central Terminal",
+      "category": "Toilette",
+      "description": "Befinden sich im Lower Level (Dining Concourse) in der Nähe der Züge. Viel Platz, aber zur Rush-Hour oft voll.",
+      "lat": 40.7527,
+      "lng": -73.9772,
+      "type": "toilet"
+    },
+    {
+      "name": "Macy's Herald Square",
+      "category": "Toilette",
+      "description": "Dein NaviYork Insider-Tipp: Gehe einfach in das riesige Kaufhaus. Toiletten gibt es auf fast jedem Stockwerk. Perfekt für eine unauffällige Pause.",
+      "lat": 40.7510,
+      "lng": -73.9897,
+      "type": "toilet"
+    },
+    {
+      "name": "The Oculus (WTC)",
+      "category": "Toilette",
+      "description": "Kostenlose und saubere Toiletten direkt in der Shopping-Mall des neuen World Trade Centers.",
+      "lat": 40.7115,
+      "lng": -74.0108,
+      "type": "toilet"
+    },
+    {
+      "name": "Central Park - Bethesda Terrace",
+      "category": "Toilette",
+      "description": "Direkt neben dem berühmten Bethesda-Brunnen. Sehr praktisch, wenn man tief im Park unterwegs ist.",
+      "lat": 40.7738,
+      "lng": -73.9708,
+      "type": "toilet"
+    },
+    {
+      "name": "Central Park - Tavern on the Green",
+      "category": "Toilette",
+      "description": "Öffentliche Toiletten direkt am Rande des Central Parks, nahe dem berühmten Restaurant.",
+      "lat": 40.7720,
+      "lng": -73.9775,
+      "type": "toilet"
+    },
+    {
+      "name": "Chelsea Market",
+      "category": "Toilette",
+      "description": "Sehr saubere Toiletten im Erdgeschoss des Food-Markets. Ideal, wenn man von der High Line kommt.",
+      "lat": 40.7423,
+      "lng": -74.0060,
+      "type": "toilet"
+    },
+    {
+      "name": "Washington Square Park",
+      "category": "Toilette",
+      "description": "Öffentliche Parktoilette am südwestlichen Rand des Parks. Eher zweckmäßig, aber lebensrettend im Village.",
+      "lat": 40.7308,
+      "lng": -73.9973,
+      "type": "toilet"
+    },
+    {
+      "name": "New York Public Library",
+      "category": "Toilette",
+      "description": "Haupteingang an der 5th Ave nutzen. Saubere Toiletten und tolles Ambiente im Inneren.",
+      "lat": 40.7532,
+      "lng": -73.9822,
+      "type": "toilet"
+    },
+    {
+      "name": "Time Warner Center",
+      "category": "Toilette",
+      "description": "Direkt am Columbus Circle. Fahre einfach in den 2. oder 3. Stock der Mall.",
+      "lat": 40.7681,
+      "lng": -73.9829,
+      "type": "toilet"
+    },
+    {
+      "name": "The High Line Park",
+      "category": "Toilette",
+      "description": "Befindet sich am Zugang Gansevoort Street. Praktisch vor oder nach dem Spaziergang über die High Line.",
+      "lat": 40.7396,
+      "lng": -74.0084,
+      "type": "toilet"
+    },
+    {
+      "name": "Pier 17 am Seaport",
+      "category": "Toilette",
+      "description": "Moderne, sehr saubere Toiletten direkt am Pier mit Blick auf die Brooklyn Bridge.",
+      "lat": 40.7061,
+      "lng": -74.0026,
+      "type": "toilet"
+    },
+    {
+      "name": "Battery Park",
+      "category": "Toilette",
+      "description": "Am Rande des Battery Parks nahe den Fähr-Terminals nach Liberty Island.",
+      "lat": 40.7033,
+      "lng": -74.0170,
+      "type": "toilet"
+    },
+    {
+      "name": "Union Square Park",
+      "category": "Toilette",
+      "description": "Klassische städtische Toilette. Vorsicht: Hat nicht immer die besten Öffnungszeiten.",
+      "lat": 40.7359,
+      "lng": -73.9911,
+      "type": "toilet"
+    },
+    {
+      "name": "Penn Station",
+      "category": "Toilette",
+      "description": "Öffentliche Toiletten für Reisende, oft mit viel Betrieb.",
+      "lat": 40.7506,
+      "lng": -73.9935,
+      "type": "toilet"
+    },
+    {
+      "name": "Apple Store 5th Ave",
+      "category": "WLAN",
+      "description": "Dein NaviYork Insider-Tipp: Wenn du richtig schnelles Internet brauchst, stell dich an den Glaswürfel von Apple. Kostenlos und rasend schnell.",
+      "lat": 40.7638,
+      "lng": -73.9718,
+      "type": "wifi"
+    },
+    {
+      "name": "LinkNYC Hotspot Times Square",
+      "category": "WLAN",
+      "description": "Kostenloser, gigantischer Hotspot der Stadt New York mitten am Times Square.",
+      "lat": 40.7580,
+      "lng": -73.9855,
+      "type": "wifi"
+    },
+    {
+      "name": "Bryant Park Free WiFi",
+      "category": "WLAN",
+      "description": "Dein NaviYork Insider-Tipp: Das WLAN im Bryant Park ist berühmt für seine Stabilität. Perfekt, um bei einem Kaffee Fotos hochzuladen.",
+      "lat": 40.7536,
+      "lng": -73.9832,
+      "type": "wifi"
+    },
+    {
+      "name": "Grand Central Terminal WiFi",
+      "category": "WLAN",
+      "description": "Kostenloses High-Speed WLAN in der gesamten Haupthalle.",
+      "lat": 40.7527,
+      "lng": -73.9772,
+      "type": "wifi"
+    },
+    {
+      "name": "The Oculus Free WiFi",
+      "category": "WLAN",
+      "description": "Sehr gutes WLAN in der gesamten Westfield Mall am Ground Zero.",
+      "lat": 40.7115,
+      "lng": -74.0108,
+      "type": "wifi"
+    },
+    {
+      "name": "New York Public Library",
+      "category": "WLAN",
+      "description": "Öffentliches, schnelles Bibliotheks-WLAN. Auch auf den Stufen vor dem Gebäude oft noch gut erreichbar.",
+      "lat": 40.7532,
+      "lng": -73.9822,
+      "type": "wifi"
+    },
+    {
+      "name": "LinkNYC Flatiron District",
+      "category": "WLAN",
+      "description": "Schnelles, öffentliches Stadt-WLAN direkt an der Kreuzung vor dem Flatiron Building.",
+      "lat": 40.7410,
+      "lng": -73.9896,
+      "type": "wifi"
+    },
+    {
+      "name": "Union Square Free WiFi",
+      "category": "WLAN",
+      "description": "Sehr gute und flächendeckende Netzabdeckung im gesamten Parkbereich.",
+      "lat": 40.7359,
+      "lng": -73.9911,
+      "type": "wifi"
+    },
+    {
+      "name": "Chelsea Market WiFi",
+      "category": "WLAN",
+      "description": "Kostenloses Netz im gesamten Gebäude. Eignet sich super für eine kurze Navigations-Pause.",
+      "lat": 40.7423,
+      "lng": -74.0060,
+      "type": "wifi"
+    },
+    {
+      "name": "Staten Island Ferry Terminal",
+      "category": "WLAN",
+      "description": "Gratis WLAN im großen Wartebereich (Whitehall Terminal), bevor du auf die Fähre gehst.",
+      "lat": 40.7013,
+      "lng": -74.0132,
+      "type": "wifi"
+    },
+    {
+      "name": "DUMBO LinkNYC (Brooklyn)",
+      "category": "WLAN",
+      "description": "Kostenloses WLAN direkt am berühmten Foto-Spot in der Washington Street in Brooklyn.",
+      "lat": 40.7032,
+      "lng": -73.9896,
+      "type": "wifi"
+    },
+    {
+      "name": "Rockefeller Center Plaza",
+      "category": "WLAN",
+      "description": "Gratis WLAN rund um die berühmte Eisbahn und die Plaza am Rockefeller Center.",
+      "lat": 40.7587,
+      "lng": -73.9787,
+      "type": "wifi"
+    }
+  ]
+}
